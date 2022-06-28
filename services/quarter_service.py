@@ -1,11 +1,32 @@
 from .bit_service import BitService
 
 
-class QuarterRoundService:
+class QuarterService:
     def __init__(self, bit_service: BitService):
         self.bit_service = bit_service
 
-    def do(self, y_0: int, y_1: int, y_2: int, y_3: int) -> list[int]:
+    def double_round(self, matrix: list[list[int]]) -> list[list[int]]:
+        return self.row_round(self.column_round(matrix))
+
+    def row_round(self, matrix: list[list[int]]) -> list[list[int]]:
+        return [
+            self.quarter_round(*line)
+            for line
+            in matrix
+        ]
+
+    def column_round(self, matrix: list[list[int]]) -> list[list[int]]:
+        return [
+            self.quarter_round(
+                matrix[0][i],
+                matrix[1][i],
+                matrix[2][i],
+                matrix[3][i],
+            )
+            for i in range(len(matrix))
+        ]
+
+    def quarter_round(self, y_0: int, y_1: int, y_2: int, y_3: int) -> list[int]:
         z_1 = self._compute_common_z(y_1, y_0, y_3, 7)
         z_2 = self._compute_common_z(y_2, z_1, y_0, 9)
         z_3 = self._compute_common_z(y_3, z_2, z_1, 13)
