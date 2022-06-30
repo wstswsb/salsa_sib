@@ -5,8 +5,8 @@ from services import BitService
 class TestBitService:
     def setup(self):
         self.service = BitService(
-            block_mask=0xFFFF_FFFF,
-            block_bit_size=32,
+            operations_mask=0xFFFF_FFFF,
+            operations_bit_size=32,
         )
 
     @pytest.mark.parametrize(
