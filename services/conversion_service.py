@@ -3,14 +3,14 @@ class ConversionService:
     def bytes_to_int_little_endian(self, sequence: bytes) -> int:
         return int.from_bytes(sequence, "little")
 
-    def int_to_bytes_from_little_endian(self, item: int) -> bytes:
-        return item.to_bytes(length=4, byteorder="little")
+    def int_to_bytes_from_little_endian(self, item: int, length=4) -> bytes:
+        return item.to_bytes(length, byteorder="little")
 
     def bytes_to_ints(self, sequence: bytes) -> list[int]:
         return [
             self.bytes_to_int_little_endian(sequence[i - 4: i])
             for i
-            in range(4, len(sequence) + 1, 4)
+            in range(4, len(sequence) + 4, 4)
         ]
 
     def ints_to_bytes(self, sequence: list[int]) -> bytes:

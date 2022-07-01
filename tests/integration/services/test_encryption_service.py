@@ -1,10 +1,14 @@
 import pytest
+from faker import Faker
+
 from services import (
     EncryptionService,
     QuarterService,
     BitService,
     ConversionService,
 )
+faker = Faker()
+Faker.seed(12345)
 
 
 class TestEncryptionService:
@@ -20,6 +24,7 @@ class TestEncryptionService:
             quarter_service=self.quarter_service,
             conversion_service=self.conversion_service,
         )
+        self.faker = Faker()
 
     @pytest.mark.parametrize(
         "sequence, result",
@@ -191,3 +196,44 @@ class TestEncryptionService:
             ]
         )
         assert self.service.salsa20_round(key, nonce, number) == result
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "some text",
+            "некоторый текст",
+            "текст с некоторыми символами !\"№;%:?*()\\1234567890-=+'",
+            "очень длинный текст" * 1000,
+            *[faker.pystr(max_chars=1000) for _ in range(1000)]
+        ]
+    )
+    def test_encrypt_decrypt_16_byte_key(self, message: str):
+        key = 5316911983139663491615228241121378303
+        nonce = 666
+
+        message_bytes = message.encode("utf8")
+        key_bytes = key.to_bytes(length=16, byteorder="little")
+        nonce_bytes = nonce.to_bytes(length=8, byteorder="little")
+        encrypted = self.service.encrypt(message_bytes, key_bytes, nonce_bytes)
+        decrypted = self.service.decrypt(encrypted, key_bytes, nonce_bytes)
+        assert decrypted == message_bytes
+
+    @pytest.mark.parametrize(
+        "message",
+        [
+            "some text",
+            "некоторый текст",
+            "текст с некоторыми символами !\"№;%:?*()\\1234567890-=+'",
+            "очень длинный текст" * 1000,
+            *[faker.pystr(max_chars=1000) for _ in range(1000)]
+        ]
+    )
+    def test_encrypt_decrypt_32_byte_key(self, message: str):
+        key = 57896044618658097711785482504343953976634992332820282019728792003956564819967
+        nonce = 666
+        message_bytes = message.encode("utf8")
+        key_bytes = key.to_bytes(length=32, byteorder="little")
+        nonce_bytes = nonce.to_bytes(length=8, byteorder="little")
+        encrypted = self.service.encrypt(message_bytes, key_bytes, nonce_bytes)
+        decrypted = self.service.decrypt(encrypted, key_bytes, nonce_bytes)
+        assert decrypted == message_bytes

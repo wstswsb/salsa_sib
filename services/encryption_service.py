@@ -1,4 +1,3 @@
-import math
 from .conversion_service import ConversionService
 from .bit_service import BitService
 from .quarter_service import QuarterService
@@ -17,11 +16,28 @@ class EncryptionService:
 
     def encrypt(self, message: bytes, key: bytes, nonce: bytes) -> bytes:
         gamma_block_bytes = 64
-        gamma_block_count = math.ceil(len(message) / gamma_block_bytes)
+        message = self.pad(message, gamma_block_bytes)
+        return self.crypt(message, key, nonce)
+
+    def decrypt(self, ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
+        decrypted = self.crypt(ciphertext, key, nonce)
+        pad_size = self.conversion_service.bytes_to_int_little_endian(decrypted[-64:])
+        decrypted = decrypted[:-(64 + pad_size)]
+        return decrypted
+
+    def pad(self, sequence: bytes, block_size: int) -> bytes:
+        pad_size = block_size - (len(sequence) % block_size)
+        sequence += b"0" * pad_size
+        sequence += self.conversion_service.int_to_bytes_from_little_endian(pad_size, length=64)
+        return sequence
+
+    def crypt(self, message: bytes, key: bytes, nonce: bytes) -> bytes:
+        gamma_block_bytes = 64
+        gamma_block_count = int(len(message) / gamma_block_bytes)
         message_ints = self.conversion_service.bytes_to_ints(message)
         gamma_ints = []
         for i in range(gamma_block_count):
-            num = self.conversion_service.int_to_bytes_from_little_endian(i)
+            num = self.conversion_service.int_to_bytes_from_little_endian(i, length=8)
             round_bytes = self.salsa20_round(key, nonce, num)
             gamma_ints += self.conversion_service.bytes_to_ints(round_bytes)
         result_ints = []
