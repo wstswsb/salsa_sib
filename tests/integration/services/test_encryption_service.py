@@ -204,7 +204,7 @@ class TestEncryptionService:
             "некоторый текст",
             "текст с некоторыми символами !\"№;%:?*()\\1234567890-=+'",
             "очень длинный текст" * 1000,
-            *[faker.pystr(max_chars=1000) for _ in range(1000)]
+            *[faker.pystr(min_chars=1, max_chars=1000) for _ in range(1000)]
         ]
     )
     def test_encrypt_decrypt_16_byte_key(self, message: str):
@@ -225,7 +225,7 @@ class TestEncryptionService:
             "некоторый текст",
             "текст с некоторыми символами !\"№;%:?*()\\1234567890-=+'",
             "очень длинный текст" * 1000,
-            *[faker.pystr(max_chars=1000) for _ in range(1000)]
+            *[faker.pystr(min_chars=1, max_chars=1000) for _ in range(1000)]
         ]
     )
     def test_encrypt_decrypt_32_byte_key(self, message: str):
