@@ -2,7 +2,7 @@
 
 
 tests: .PHONY
-	pytest --tb=short -n 8 --cov-report term-missing --cov=. ./tests/
+	pytest -s -n 6 --cov-report term-missing --cov=. ./tests/
 
 lint:
 	flake8 ./
