@@ -41,6 +41,7 @@ class TestQuarterService:
                 0xd391_7c5b, 0x55f1_c407, 0x52a5_8a7a, 0x8f88_7a3b,
                 [0x3e2f_308c, 0xd90a_8f36, 0x6ab2_a923, 0x2883_524c]
             ),
+
         ]
     )
     def test_quarter_round(
@@ -49,6 +50,7 @@ class TestQuarterService:
             y_2: int, y_3: int,
             result: list[int]):
         assert self.service.quarter_round(y_0, y_1, y_2, y_3) == result
+        assert self.service.reversed_quarter_round(*result) == [y_0, y_1, y_2, y_3]
 
     @pytest.mark.parametrize(
         "matrix, result",
@@ -85,6 +87,7 @@ class TestQuarterService:
     )
     def test_row_round(self, matrix, result):
         assert self.service.row_round(matrix) == result
+        assert self.service.row_round(result, reverse=True) == matrix
 
     @pytest.mark.parametrize(
         "matrix, result",
@@ -121,6 +124,7 @@ class TestQuarterService:
     )
     def test_column_round(self, matrix, result):
         assert self.service.column_round(matrix) == result
+        assert self.service.column_round(result, reverse=True) == matrix
 
     @pytest.mark.parametrize(
         "matrix, result",

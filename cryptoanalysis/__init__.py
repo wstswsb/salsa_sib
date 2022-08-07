@@ -1,1 +1,3 @@
 from .xdp_plus_calculator import XdpPlusCalculator
+from .binary_vectors_generator import BinaryVectorsGenerator
+from .statistics_service import StatisticsService

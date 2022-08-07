@@ -1,8 +1,13 @@
 from exceptions import InvalidBitLengthException
+from .binary_vectors_generator import BinaryVectorsGenerator
 
 
 class XdpPlusCalculator:
-    def __init__(self, bit_length: int):
+    def __init__(
+            self,
+            bit_length: int,
+            binary_vectors_generator: BinaryVectorsGenerator):
+        self.binary_vectors_generator = binary_vectors_generator
         self.bit_length = bit_length
         self.mask = 2 ** bit_length - 1
         self.mask_n_sub_1 = self.mask >> 1
@@ -27,6 +32,34 @@ class XdpPlusCalculator:
         if (equality & xor_result) != 0:
             return 0.0
         return 2 ** self._calculate_probability_degree(alpha, betta, gamma)
+
+    def find_xdp_most_probability_gamma(
+            self,
+            alpha: int,
+            betta: int,
+            upper_board=4) -> dict:
+        xdp_stat = []
+        for number_of_different_bits in range(upper_board):
+            gamma_generator = self.binary_vectors_generator.generate_different_values(
+                alpha,
+                number_of_different_bits,
+            )
+            for gamma in gamma_generator:
+                xdp = self.find_xdp(alpha, betta, gamma)
+                if not xdp:
+                    continue
+                xdp_stat.append(
+                    {
+                        "alpha": alpha,
+                        "betta": betta,
+                        "gamma": gamma,
+                        "probability": xdp,
+                    }
+                )
+        if not xdp_stat:
+            return {"alpha": alpha, "betta": betta, "gamma": gamma, "probability": 0}
+        xdp_stat.sort(key=lambda x: -x["probability"])
+        return xdp_stat[0]
 
     def find_slow_xdp(
             self, alpha: int, betta: int,

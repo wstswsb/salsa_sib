@@ -1,10 +1,15 @@
 import pytest
+from mock import Mock
 from cryptoanalysis import XdpPlusCalculator
 
 
 class TestXdpPlusCalculator:
     def setup(self):
-        self.calculator = XdpPlusCalculator(32)
+        self.binary_vectors_generator_mock = Mock()
+        self.calculator = XdpPlusCalculator(
+            bit_length=32,
+            binary_vectors_generator=self.binary_vectors_generator_mock,
+        )
 
     @pytest.mark.parametrize(
         "number, result",
@@ -33,7 +38,10 @@ class TestXdpPlusCalculator:
         ]
     )
     def test_xdp(self, alpha, betta, gamma):
-        calculator = XdpPlusCalculator(bit_length=4)
+        calculator = XdpPlusCalculator(
+            bit_length=4,
+            binary_vectors_generator=self.binary_vectors_generator_mock,
+        )
         expected = calculator.find_slow_xdp(alpha, betta, gamma, bit_length=4)
         result = calculator.find_xdp(alpha, betta, gamma)
         assert result == expected
